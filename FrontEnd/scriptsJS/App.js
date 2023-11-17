@@ -28,8 +28,10 @@ fetch('http://localhost:5678/api/works')
   .then((data) => {
     data.forEach((work) => {
       let figure = afficherProjet(work);
-      gallerySection.appendChild(figure)
+      gallerySection.appendChild(figure);
+      
     });
+    localStorage.setItem('worksedit', JSON.stringify(data));
   });
 
 /********************************************
@@ -86,6 +88,7 @@ fetch('http://localhost:5678/api/categories')
       let bouton = afficherAutresBoutons(categorie);
       boutonSection.appendChild(bouton);
     });
+    localStorage.setItem('categoriesModal', JSON.stringify(data));
   });
 
 //fonction qui eneleve le CSS sélection de tous les boutons
