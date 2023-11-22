@@ -1,27 +1,31 @@
 // Variables pour la modal suppression de projets
-const modalDeleteWork = document.querySelector("#modal-works");
+const modalDeleteWork = document.querySelector("#modalsSuppr");
 const openGalleryModalBtn = document.querySelector("#figure-modify");
-const closeGalleryModalBtn = document.querySelector(".modal-close");
-const galleryModal = document.querySelector(".modal-content");
+const closeGalleryModalBtn = document.querySelector(".fermer");
+const galleryModal = document.querySelector(".gallerymodal");
 
 // Variables pour la modal ajout de projets
-const modalAddWork = document.querySelector("#modal-edit");
-const openAddWork = document.querySelector("#modal-edit-add");
-const previousBtn = document.querySelector("#precedent");
-const closeAddWorkModalBtn = document.querySelector("#button-to-close-second-window");
-const categorySelect = document.querySelector("#modal-photo-category");
+const modalAddWork = document.querySelector("#modalsAjout");
+const openAddWork = document.querySelector("#AjoutPhoto");
+const previousBtn = document.querySelector(".precedent");
+const closeAddWorkModalBtn = document.querySelector("#fermer-ajout");
+const categorySelect = document.querySelector("#selectCategorie");
 
 // Variables pour upload une image
-const uploadImageInput = document.querySelector("#form-image");
+const uploadImageInput = document.querySelector("#imageUpload");
 const projectUpload = document.querySelector("#previewImage");
-const uploadContent = document.querySelector("#modal-edit-new-photo");
+const uploadContent = document.querySelector("#previewdetails");
 const submitProjet = document.querySelector("#validerAjout");
 const backgroundPreview = document.querySelector(".AjoutPhotoContainer");
 
+//variable input titre
+const inputTitle = document.querySelector("#titreAjout");
+
+//Variable pour le form
 const addProjectForm = document.querySelector("#ajout-form");
 
 // Variable pour background modal
-const backgroundModal = document.querySelector("#modal");
+const backgroundModal = document.querySelector("#modals");
 
 // Fonction pour ouvrir modal galerie pour supprimer un projet et celle pour ajouter un projet
 function openGalleryModal() {
@@ -43,15 +47,20 @@ function closeGalleryModal() {
         projectUpload.innerHTML = "";
         uploadContent.style.display = "flex";
     }
-    if(galleryModal.firstChild){
+    if (galleryModal.firstChild) {
         galleryModal.innerHTML = "";
     }
-    
-}
 
+    // reset form
+    submitProjet.style.backgroundColor = "#A7A7A7";
+    addProjectForm.reset();
+
+}
+//fonction fermer modal
 function closeAddWorkModal() {
     modalAddWork.style.display = "none";
     backgroundModal.style.display = "none";
+    categorySelect.innerHTML = "";
 }
 
 // Ouvrir les modals
@@ -70,47 +79,178 @@ if (openAddWork) {
     });
 }
 
-// Fermer les modals et précédent
+// Fermer X event
 closeGalleryModalBtn.addEventListener("click", event => {
     event.preventDefault();
     closeGalleryModal();
 });
 
+//bouton fermer X event
 closeAddWorkModalBtn.addEventListener("click", event => {
     event.preventDefault();
     closeAddWorkModal();
 });
 
+// bouton précedent du 2ieme modal event
 previousBtn.addEventListener("click", event => {
     event.preventDefault();
     closeAddWorkModal();
     openGalleryModal();
-    addWorkModal();
 });
 
+
+//event lors de la modif du titre
+inputTitle.addEventListener("input", (event) => {
+    verifValidityForm();
+});
+
+//fermer modal quand on click en dehors du modal
 window.onclick = function (event) {
     if (event.target == backgroundModal) {
         closeAddWorkModal();
         closeGalleryModal();
+        // reset form
+        submitProjet.style.backgroundColor = "#A7A7A7";
+        addProjectForm.reset();
     }
 }
 
+// fonction rajouter les works dans le modal
+function addWorkModal() {
+    const fragment = document.createDocumentFragment();
+    //Appel function récup Works 
+    const oWorks = getOWorks("");
+    //rajout des works dans le content
+    oWorks.then(works => {
+        works.forEach((work) => {
+            const div = document.createElement('div');
+            div.id = "gallery_edit_img" + work.id;
+            div.setAttribute("class", "gallery_edit_img");
 
-// // Supprimer des photos
-function deleteWork(event, id) {
-    alert("supression projet ID: " + id);
+            const img = document.createElement('img');
+            img.src = work.imageUrl;
+            img.crossOrigin = 'anonymous';
+            div.appendChild(img);
+
+            const i = document.createElement('i');
+            i.setAttribute("class", "fa fa-trash");
+            i.setAttribute("data-id", work.id);
+            i.addEventListener("click", event => {
+                event.preventDefault();
+                deleteWork(work);
+            });
+
+            div.appendChild(i);
+            fragment.appendChild(div);
+        })
+        galleryModal.appendChild(fragment);
+    });
 }
- 
 
+
+
+//fonction rajouter les categories dans le selectOption
+function setCategoriesSelect() {
+    //Appel function récup Ctegories
+    const oCategories = getOCategories("");
+    //insert categories dans le selectOption
+    oCategories.then(categories => {
+        categories.forEach((category) => {
+            let divCatOption = document.createElement("option");
+            divCatOption.value = `${category.id}`;
+            divCatOption.text = `${category.name}`;
+            categorySelect.add(divCatOption);
+        })
+    });
+}
+
+
+
+// Supprimer des photos
+function deleteWork(work) {
+    let text = "Voulez vous supprimer le projet:  " + work.title + "  ?";
+    //pop up de confirmation
+    if (confirm(text) == true) {
+        //Appel API delete
+        const sUrl = "http://localhost:5678/api/works/" + work.id;
+        fetch(sUrl, {
+            method: "DELETE",
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': getAuthorization(),
+                'Content-Type': 'application/json',
+            },
+            params: {
+                'id': work.id
+            },
+        }).then((response) => {
+            if (response.ok) {
+                //IDs dans modal et figure
+                let imgId = "#gallery_edit_img" + work.id;
+                let figureId = "#figure" + work.id;
+                //recup elements
+                const deltedWork = document.querySelector(imgId);
+                const deletedFigure = document.querySelector(figureId);
+                //Actualisation du DOM
+                deltedWork.remove();
+                deletedFigure.remove();
+            } else {
+                throw new Error('Erreur lors de la supression');
+            }
+        }).catch((error) => {
+            console.error('Error Delete:', error);
+        });
+    }
+}
+
+addProjectForm.addEventListener("submit", onValiderForm);
+//ajouter les works via API
+async function onValiderForm() {
+
+    // Récupérer les valeurs du formulaire déja vérifiés
+    const title = inputTitle.value;
+    const category = categorySelect.value;
+    const file = uploadImageInput.files[0];
+
+    //form data pour envoyer les données
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("title", title);
+    formData.append("category", category);
+
+    try {
+        //Appel fonction fetch
+        const response = await sendnewWork(formData);
+    } catch (error) {
+        console.log(error);
+    }
+
+}
+
+// Fonctions pour ajouter des projets
+async function sendnewWork(data) {
+    const sUrl = "http://localhost:5678/api/works";
+    return fetch(sUrl, {
+        method: "POST",
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Authorization': getAuthorization()
+        },
+        body: data
+    }).catch(error => {
+        //Here is still promise
+        console.log(error);
+        error.json().then((body) => {
+            //Here is already the payload from API
+            console.log(body);
+        });
+    });
+}
 // Ajout des événements pour gérer l'upload de photos
 uploadImageInput.addEventListener("change", event => {
     uploadImage();
+    verifValidityForm();
 });
-
-// addProjectForm.addEventListener("submit", event =>{
-//     event.preventDefault();
-//     handleFormSubmit();
-// });
 
 // Fonction pour afficher l'aperçu de l'image
 function uploadImage() {
@@ -125,7 +265,6 @@ function uploadImage() {
         };
 
         uploadContent.style.display = "none";
-        // submitProjet.style.backgroundColor = "#1D6154";
         projectUpload.style.display = "block";
         backgroundPreview.style.backgroundColor = "#FFFFFF";
         reader.readAsDataURL(uploadImageInput.files[0]);
@@ -133,41 +272,16 @@ function uploadImage() {
     }
 }
 
-
-function addWorkModal() {
-    const fragment = document.createDocumentFragment();
-    const works = JSON.parse(localStorage.getItem('worksedit'));
-    works.forEach((work) => {
-        const div = document.createElement('div');
-        div.id = "gallery_edit_img";
-
-        const img = document.createElement('img');
-        img.src = work.imageUrl;
-        img.crossOrigin = 'anonymous';
-        div.appendChild(img);
-
-        const i = document.createElement('i');
-        i.setAttribute("class", "fa fa-trash");
-        i.setAttribute("data-id", work.id);
-        i.setAttribute("onclick", "deleteWork(this, " + work.id + ")");
-        div.appendChild(i);
-
-        const p = document.createElement('p');
-        p.setAttribute("data-id", work.id);
-        div.appendChild(p);
-
-        fragment.appendChild(div);
-    });
-    galleryModal.appendChild(fragment);
-}
-
-function setCategoriesSelect() {
-
-    const categories = JSON.parse(localStorage.getItem('categoriesModal'));
-    categories.forEach((category) => {
-        let divCatOption = document.createElement("option");
-        divCatOption.value = `${category.id}`;
-        divCatOption.text = `${category.name}`;
-        categorySelect.add(divCatOption);
-    });
+//vérif si tous les champs sont remplis pour activer le bouton
+function verifValidityForm() {
+    // Récupérer les valeurs du formulaire
+    const title = inputTitle.value;
+    const category = categorySelect.value;
+    const file = uploadImageInput.files[0];
+    if (title != "" && category != "" && file) {
+        //activer bouton
+        submitProjet.style.backgroundColor = "#1D6154";
+    } else {
+        submitProjet.style.backgroundColor = "#A7A7A7";
+    }
 }

@@ -2,29 +2,29 @@
 const modeEdition = document.querySelector("#admin-logged");
 const editBtn = document.querySelector("#figure-modify");
 const logout = document.querySelector('[href="login.html"]');
-const filters = document.querySelectorAll(".Filtres");
+const filters = document.querySelector(".Filtres");
 
 // Si nous avons récupéré le token
-if (isConnected()) {
+if (getAuthorization()) {
     modeEdition.style.display = "flex";
     editBtn.style.display = "flex";
 
-    for (let i = 0; i < filters.length; i++) {
-        filters[i].style.display = "none";
-    }
-    
+    //hider les boutons filtres
+    filters.style.display = "none";
+
     // Changer login en logout
     logout.textContent = "logout";
     logout.setAttribute("href", "#");
-    
+
     // Lorque l'on click sur logout cela déconnecte l'utilisateur
     logout.addEventListener("click", event => {
         event.preventDefault();
-        // localStorage.removeItem("userId");
-        localStorage.removeItem("token");     
+        // enlever token
+        localStorage.removeItem("token");
+        //refresh index.html
         window.location.reload();
     });
-}else{
+} else {
     //reset mode
     modeEdition.style.display = "none";
     editBtn.style.display = "none";
@@ -32,17 +32,11 @@ if (isConnected()) {
 
 // fonction pour récuperer l'id utilisateur et le token
 function getAuthorization() {
-    if(localStorage.getItem('token')){
-    const token = JSON.parse(localStorage.getItem('token')).token;
-    return 'Bearer ' + token;
-    }else{
+    if (localStorage.getItem('token')) {
+        const token = JSON.parse(localStorage.getItem('token')).token;
+        return 'Bearer ' + token;
+    } else {
         return false;
     }
-    
-  }
-  
-  // Fonction pour voir si l'utilisateur est connecté
-  function isConnected() {
-    const connecting = getAuthorization() ? true : false;
-    return connecting;
-  }
+
+}

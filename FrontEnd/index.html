@@ -86,58 +86,68 @@
 		</nav>
 	</footer>
 
-	<!--creation des modals-->
-	<section class="modals">
-		<div id="modal" class="modal1" aria-hidden="true" role="dialog" aria-labelledby="title-modal1">
-			<div id="modal-works" class="modal-gallery">
-				<a id="button-to-close-first-window" class="modal-close"><i class="fa-solid fa-xmark"></i></a>
-				<h2 id="title-modal1" class="modal-title">Galerie photo</h2>
-				<div class="modal-content">
-					<!-- rajout des works dynamiquement dans le modal-content -->
-				</div>
-				<!--ajouter et supprimer les photos-->
-				<div class="container-modal-add-and-modal-delete">
-					<button id="modal-edit-add" class="modal-add">Ajouter une photo</button>
-					<!-- <a href="#" class="modal-delete-all">Supprimer la galerie</a> -->
-				</div>
+	<section id="modals">
+
+		<!-- Galerie photo = Ajout ou suppr -->
+		<div id="modalsSuppr">
+			<div class="fermer" id="fermer-suppr">
+				<i class="fa-solid fa-xmark"></i>
 			</div>
-
-			<div id="modal-edit" class="modal-edit-work">
-				<div class="container-for-icon-in-second-window-of-modal">
-					<a id="precedent" href="#"><i class="fa-solid fa-arrow-left"></i></a>
-					<a id="button-to-close-second-window" href="#"><i class="fa-solid fa-xmark"></i></a>
+	
+			<h2>Galerie photo</h2>
+			<div id="alert" class="alert alert-success" role="alert">
+			</div>
+			<div class="gallerymodal">
+	
+			</div>
+			<hr>
+	
+			<input type="submit" value="Ajouter une photo" id="AjoutPhoto">
+		</div>
+	
+		<!-- Ajout Photo-->
+		<div id="modalsAjout">
+			<nav class="navModal">
+				<div class="precedent">
+					<i class="fa-solid fa-arrow-left-long"></i>
 				</div>
-
-				<h2 class="modal-title">Ajout photo</h2>
-				<form id="modal-edit-work-form" method="post" action="#">
+				<div class="fermer" id="fermer-ajout">
+					<i class="fa-solid fa-xmark"></i>
+				</div>
+			</nav>
+	
+			<div class="AjoutImageContainer">
+				<h2>Ajout photo</h2>
+	
+				<form id="ajout-form" method="post" enctype="multipart/form-data">
 					<div class="AjoutPhotoContainer">
 						<div id="previewImage">
 						</div>
-						<div id="modal-edit-new-photo" class="modal-content-new-photo">
-							<i id="photo-add-icon" class="fa-regular fa-image"></i>
-							<label id="new-image">+ Ajouter photo</label>
-							<input id="form-image" type="file" name="image" accept="image/*, .jpg, .jpeg, .png"
-								required>
-							<p id="photo-size">jpg, png : 4mo max</p>
-						</div>
-
-						<div class="modal-photo-input">
-							<label for="title">Titre</label>
-							<input type="text" name="title" id="modal-photo-title">
+	
+						<div id="previewdetails">
+							<i class="fa-regular fa-image"></i>
+							<label for="imageUpload" id="btnImage">+ Ajouter photo</label>
+							<input  type="file" accept=".png, .jpg, .jpeg" id="imageUpload" required>
+							<span>jpg, png : 4mo max</span>
 						</div>
 					</div>
-
-					<div class="modal-photo-input" id="barre-grise">
-						<label for="category">Catégorie</label>
-						<select name="category" id="modal-photo-category" required="true">
-							<option value=""></option>
-						</select>
-					</div>
-					<input type="submit" value="Valider" id="modal-valider">
+	
+				
+				<div class="AjoutDetail">
+					<label>Titre</label>
+					<input type="text" name="titre" id="titreAjout" required>
+					<label>Catégorie</label>
+					<select name="categorie" id="selectCategorie" required>
+					</select>
+				</div>
+	
+				<hr>
+	
+				<input type="submit" value="Valider" id="validerAjout">
+				
+				</form>
 			</div>
-			</form>
-		</div>
-		</div>
+	
 		</div>
 	</section>
 </body>

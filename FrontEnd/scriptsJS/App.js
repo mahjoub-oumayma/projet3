@@ -9,6 +9,7 @@ const boutonSection = document.getElementById("filtres");
 function afficherProjet(work) {
   // créer balise figure
   const figure = document.createElement("figure");
+  figure.id = "figure" + `${work.id}`;
   //rajouter balise img
   const img = document.createElement("img");
   //rajouter balise figCaption
@@ -23,16 +24,8 @@ function afficherProjet(work) {
 
   return figure;
 }
-fetch('http://localhost:5678/api/works')
-  .then((response) => response.json())
-  .then((data) => {
-    data.forEach((work) => {
-      let figure = afficherProjet(work);
-      gallerySection.appendChild(figure);
-      
-    });
-    localStorage.setItem('worksedit', JSON.stringify(data));
-  });
+//Appel API Works
+const oWorks = getOWorks("main");
 
 /********************************************
  Partie dédié à l'affichage des boutons
@@ -80,16 +73,9 @@ function afficherAutresBoutons(categorie) {
 
   return divCatButton;
 }
-fetch('http://localhost:5678/api/categories')
-  .then((response) => response.json())
-  .then((data) => {
-    afficherTousBouton();
-    data.forEach((categorie) => {
-      let bouton = afficherAutresBoutons(categorie);
-      boutonSection.appendChild(bouton);
-    });
-    localStorage.setItem('categoriesModal', JSON.stringify(data));
-  });
+
+//Appel API Categories
+const oCategories = getOCategories("main");
 
 //fonction qui eneleve le CSS sélection de tous les boutons
 function enleverAllSelection() {
@@ -120,6 +106,47 @@ function filtrerProjetsParCategorie(oFilter) {
     }
   });
 }
+
+
+/*************************************************************
+********* déclaration des fonctions d'appels API *************
+**************************************************************/
+
+// fonction récup works
+/* sTarget pour modifier la gallerySection sinon
+retoruner simplement les data*/
+async function getOWorks(sTarget) {
+  const response = await fetch('http://localhost:5678/api/works');
+  const data = await response.json();
+  if (sTarget === "main") {
+    data.forEach((work) => {
+      let figure = afficherProjet(work);
+      gallerySection.appendChild(figure);
+
+    });
+  }
+  return data;
+}
+
+
+//fonction récup Categories
+/* sTarget pour modifier la boutonSection sinon
+retoruner simplement les data*/
+async function getOCategories(sTarget) {
+  const response = await fetch('http://localhost:5678/api/categories');
+  const data = await response.json();
+  afficherTousBouton();
+  if (sTarget === "main") {
+    data.forEach((categorie) => {
+      let bouton = afficherAutresBoutons(categorie);
+      boutonSection.appendChild(bouton);
+    });
+  }
+  return data;
+}
+/***********************************************************************/
+
+
 
 
 
