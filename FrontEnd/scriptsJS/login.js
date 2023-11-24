@@ -42,19 +42,5 @@ if (submibtn) {
             messageError.style.display = "flex";
         })
 
-        // function vidertoken() {
-        //     localStorage.removeItem('token')
-        //     location.reload ();
-        //     const jeton= localStorage.getItem('token');
-        //     if (jeton.length>20 && typeof jeton ==='string'){
-        //         const login= document.getElementById('login')
-        //         const logout= document.getElementById('logaout')
-        //     }
-        //     logout.style.display='block'
-        //     login.style.display='none'
-        //     logout.addEventListener('click',()=> {
-        //         vidertoken();
-        //     }) }
-
     });
 }

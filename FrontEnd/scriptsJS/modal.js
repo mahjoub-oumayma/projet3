@@ -130,6 +130,7 @@ function addWorkModal() {
             const img = document.createElement('img');
             img.src = work.imageUrl;
             img.crossOrigin = 'anonymous';
+            img.title = work.title;
             div.appendChild(img);
 
             const i = document.createElement('i');
@@ -203,7 +204,11 @@ function deleteWork(work) {
     }
 }
 
-addProjectForm.addEventListener("submit", onValiderForm);
+addProjectForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    onValiderForm();
+
+});
 //ajouter les works via API
 async function onValiderForm() {
 
@@ -214,16 +219,22 @@ async function onValiderForm() {
 
     //form data pour envoyer les données
     const formData = new FormData();
-    formData.append("image", file);
     formData.append("title", title);
+    formData.append("image", file);
     formData.append("category", category);
 
-    try {
-        //Appel fonction fetch
-        const response = await sendnewWork(formData);
-    } catch (error) {
-        console.log(error);
-    }
+    //attendre la réponse pour MAJ DOM
+    const resp = await sendnewWork(formData);
+    //MAJ DOM sans refresh
+    let newFigure = afficherProjet(resp);
+    gallerySection.appendChild(newFigure);
+    //reset form pour rajout nouvelle photo
+    projectUpload.style.display = "flex";
+    uploadContent.style.display = "flex";
+    backgroundPreview.style.backgroundColor = "#E8F1F6";
+    projectUpload.innerHTML = "";
+    addProjectForm.reset();
+
 
 }
 
@@ -237,14 +248,18 @@ async function sendnewWork(data) {
             'Authorization': getAuthorization()
         },
         body: data
+    }).then((response) => {
+        return response.json().then((respdata) => {
+            alert("Votre projet a été ajouté avec succès");
+            return respdata;
+        });
     }).catch(error => {
-        //Here is still promise
         console.log(error);
         error.json().then((body) => {
-            //Here is already the payload from API
             console.log(body);
         });
     });
+
 }
 // Ajout des événements pour gérer l'upload de photos
 uploadImageInput.addEventListener("change", event => {
@@ -266,7 +281,8 @@ function uploadImage() {
 
         uploadContent.style.display = "none";
         projectUpload.style.display = "block";
-        backgroundPreview.style.backgroundColor = "#FFFFFF";
+
+       // backgroundPreview.style.backgroundColor = "#FFFFFF";
         reader.readAsDataURL(uploadImageInput.files[0]);
         projectUpload.appendChild(image);
     }

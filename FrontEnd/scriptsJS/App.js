@@ -122,7 +122,6 @@ async function getOWorks(sTarget) {
     data.forEach((work) => {
       let figure = afficherProjet(work);
       gallerySection.appendChild(figure);
-
     });
   }
   return data;
