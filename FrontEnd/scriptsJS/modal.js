@@ -222,7 +222,7 @@ addProjectForm.addEventListener("submit", (event) => {
     if (bValid) {
         onValiderForm();
     } else {
-        alert("merci de remplir tous les champs ");
+        alert("Merci de remplir tous les champs ");
     }
 
 });
@@ -244,18 +244,12 @@ async function onValiderForm() {
     //attendre la réponse pour Mettre à jours le DOM aprés 
     const resp = await sendnewWork(formData);
     if (resp) {
-        //mise à jours du DOM sans rafraichir la page
+        //mise à jour du DOM sans rafraichir la page
         let newFigure = afficherProjet(resp);
         gallerySection.appendChild(newFigure);
-
-        //Reset formulaire pour rajouter une nouvelle photo à la foulée
-        projectUpload.style.display = "flex";
-        uploadContent.style.display = "flex";
-        backgroundPreview.style.backgroundColor = "#E8F1F6";
-        projectUpload.innerHTML = "";
-        uploadImageInput.value = "";
-        addProjectForm.reset();
-        submitProjet.style.backgroundColor = "#A7A7A7";
+        //retour à galleryModal
+        closeAddWorkModal();
+        openGalleryModal();
     } else {
         alert("Une erreur s'est produite lors de l'ajout");
     }
@@ -279,10 +273,7 @@ async function sendnewWork(data) {
         });
     }).catch(error => {
         console.log(error);
-        error.json().then((body) => {
-            console.log(body);
-            return false;
-        });
+        return false;
     });
 
 }
