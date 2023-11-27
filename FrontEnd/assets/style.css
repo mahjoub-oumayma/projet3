@@ -219,6 +219,7 @@ input[type="submit"]{
 	height: 36px;
 	text-align: center;
 	border-radius: 60px ;
+	cursor: pointer;
 }
 
 footer nav ul {
@@ -379,7 +380,7 @@ a:active {
 	padding: 20px;
 	border: 1px solid #818181;
 	width: 630px;
-	height: 670px;
+	/* height: 670px; */
 	flex-direction: column;
 }
 
@@ -388,6 +389,7 @@ a:active {
 	display: flex;
 	justify-content: flex-end;
 	font-size: 25px;
+	cursor: pointer;
 }
 
 #modals h2 {
@@ -480,12 +482,13 @@ figcaption {
 .precedent {
 	color: black;
 	font-size: 25px;
+	cursor: pointer;
 }
 
 /* Ajout photo */
 
 .AjoutImageContainer {
-	height: 670px;
+
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -504,7 +507,7 @@ figcaption {
 #previewImage {
 	width: 9em;
 	display: none;
-	padding-bottom: 18px;
+	/* padding-bottom: 18px; */
 }
 
 #previewImage img {
@@ -556,6 +559,7 @@ figcaption {
 	border-radius: 60px ;
 	color: #306685;
 	margin: 0.5rem 0;
+	cursor: pointer;
 }
 
 .AjoutDetail {

@@ -79,19 +79,19 @@ if (openAddWork) {
     });
 }
 
-// Fermer X event
+// Fermer X event Gallery Modal
 closeGalleryModalBtn.addEventListener("click", event => {
     event.preventDefault();
     closeGalleryModal();
 });
 
-//bouton fermer X event
+//bouton fermer X event Ajout photo
 closeAddWorkModalBtn.addEventListener("click", event => {
     event.preventDefault();
     closeAddWorkModal();
 });
 
-// bouton précedent du 2ieme modal event
+// bouton précedent du modal Ajout photo event
 previousBtn.addEventListener("click", event => {
     event.preventDefault();
     closeAddWorkModal();
@@ -101,7 +101,11 @@ previousBtn.addEventListener("click", event => {
 
 //event lors de la modif du titre
 inputTitle.addEventListener("input", (event) => {
-    verifValidityForm();
+    let bValid = verifValidityForm();
+});
+
+categorySelect.addEventListener("change", (event) => {
+    let bValid = verifValidityForm();
 });
 
 //fermer modal quand on click en dehors du modal
@@ -110,15 +114,19 @@ window.onclick = function (event) {
         closeAddWorkModal();
         closeGalleryModal();
         // reset form
-        submitProjet.style.backgroundColor = "#A7A7A7";
+        projectUpload.style.display = "flex";
+        uploadContent.style.display = "flex";
+        backgroundPreview.style.backgroundColor = "#E8F1F6";
+        projectUpload.innerHTML = "";
         addProjectForm.reset();
+        submitProjet.style.backgroundColor = "#A7A7A7";
     }
 }
 
 // fonction rajouter les works dans le modal
 function addWorkModal() {
     const fragment = document.createDocumentFragment();
-    //Appel function récup Works 
+    //Appel function récup Works via API
     const oWorks = getOWorks("");
     //rajout des works dans le content
     oWorks.then(works => {
@@ -152,10 +160,14 @@ function addWorkModal() {
 
 //fonction rajouter les categories dans le selectOption
 function setCategoriesSelect() {
-    //Appel function récup Ctegories
+    //Appel fonction récup Categories via API
     const oCategories = getOCategories("");
     //insert categories dans le selectOption
     oCategories.then(categories => {
+        //le premier choix vide par défaut
+        let divEmptyCatOption = document.createElement("option");
+        categorySelect.add(divEmptyCatOption);
+        //les autres catégories dynamiquement
         categories.forEach((category) => {
             let divCatOption = document.createElement("option");
             divCatOption.value = `${category.id}`;
@@ -164,7 +176,6 @@ function setCategoriesSelect() {
         })
     });
 }
-
 
 
 // Supprimer des photos
@@ -199,16 +210,23 @@ function deleteWork(work) {
                 throw new Error('Erreur lors de la supression');
             }
         }).catch((error) => {
-            console.error('Error Delete:', error);
+            console.error('Erreur lors de la supression:', error);
         });
     }
 }
 
+// event bouton valider form ajouter photo
 addProjectForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    onValiderForm();
+    let bValid = verifValidityForm();
+    if (bValid) {
+        onValiderForm();
+    } else {
+        alert("merci de remplir tous les champs ");
+    }
 
 });
+
 //ajouter les works via API
 async function onValiderForm() {
 
@@ -223,18 +241,24 @@ async function onValiderForm() {
     formData.append("image", file);
     formData.append("category", category);
 
-    //attendre la réponse pour MAJ DOM
+    //attendre la réponse pour Mettre à jours le DOM aprés 
     const resp = await sendnewWork(formData);
-    //MAJ DOM sans refresh
-    let newFigure = afficherProjet(resp);
-    gallerySection.appendChild(newFigure);
-    //reset form pour rajout nouvelle photo
-    projectUpload.style.display = "flex";
-    uploadContent.style.display = "flex";
-    backgroundPreview.style.backgroundColor = "#E8F1F6";
-    projectUpload.innerHTML = "";
-    addProjectForm.reset();
+    if (resp) {
+        //mise à jours du DOM sans rafraichir la page
+        let newFigure = afficherProjet(resp);
+        gallerySection.appendChild(newFigure);
 
+        //Reset formulaire pour rajouter une nouvelle photo à la foulée
+        projectUpload.style.display = "flex";
+        uploadContent.style.display = "flex";
+        backgroundPreview.style.backgroundColor = "#E8F1F6";
+        projectUpload.innerHTML = "";
+        uploadImageInput.value = "";
+        addProjectForm.reset();
+        submitProjet.style.backgroundColor = "#A7A7A7";
+    } else {
+        alert("Une erreur s'est produite lors de l'ajout");
+    }
 
 }
 
@@ -257,6 +281,7 @@ async function sendnewWork(data) {
         console.log(error);
         error.json().then((body) => {
             console.log(body);
+            return false;
         });
     });
 
@@ -264,7 +289,7 @@ async function sendnewWork(data) {
 // Ajout des événements pour gérer l'upload de photos
 uploadImageInput.addEventListener("change", event => {
     uploadImage();
-    verifValidityForm();
+    let bValid = verifValidityForm();
 });
 
 // Fonction pour afficher l'aperçu de l'image
@@ -282,7 +307,6 @@ function uploadImage() {
         uploadContent.style.display = "none";
         projectUpload.style.display = "block";
 
-       // backgroundPreview.style.backgroundColor = "#FFFFFF";
         reader.readAsDataURL(uploadImageInput.files[0]);
         projectUpload.appendChild(image);
     }
@@ -295,9 +319,12 @@ function verifValidityForm() {
     const category = categorySelect.value;
     const file = uploadImageInput.files[0];
     if (title != "" && category != "" && file) {
-        //activer bouton
+        //activer bouton 
         submitProjet.style.backgroundColor = "#1D6154";
+        return true;
     } else {
+        //desactiver bouton
         submitProjet.style.backgroundColor = "#A7A7A7";
+        return false;
     }
 }
