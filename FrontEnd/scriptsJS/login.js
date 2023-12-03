@@ -1,10 +1,10 @@
 const login = document.querySelector(".form-login");
 const messageError = document.querySelector("#msg-error");
-const submibtn = document.querySelector("#btnSubmit");
+const submitBtn = document.querySelector("#btnSubmit");
 /*** se connecter lorsque l'on clique sur le bouton */
 
-if (submibtn) {
-    submibtn.addEventListener("click", function (event) {
+if (submitBtn) {
+    submitBtn.addEventListener("click", function (event) {
         event.preventDefault();
 
         /** validation de formulaire */

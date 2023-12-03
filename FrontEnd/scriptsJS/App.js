@@ -1,6 +1,5 @@
 /** Constantes **/
 const gallerySection = document.querySelector(".gallery");
-const filtreSection = document.querySelector(".projet");
 const boutonSection = document.getElementById("filtres");
 
 /********************************************

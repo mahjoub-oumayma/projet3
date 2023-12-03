@@ -242,7 +242,7 @@ async function onValiderForm() {
     formData.append("category", category);
 
     //attendre la réponse pour Mettre à jours le DOM aprés 
-    const resp = await sendnewWork(formData);
+    const resp = await sendNewWork(formData);
     if (resp) {
         //mise à jour du DOM sans rafraichir la page
         let newFigure = afficherProjet(resp);
@@ -257,7 +257,7 @@ async function onValiderForm() {
 }
 
 // Fonctions pour ajouter des projets
-async function sendnewWork(data) {
+async function sendNewWork(data) {
     const sUrl = "http://localhost:5678/api/works";
     return fetch(sUrl, {
         method: "POST",
